@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACA SPORT - Separar Campo</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="icon" href="imagenes/logo.png" type="image/png">
+    <style>
+        .alerta-exito {
+            display: none;
+            background-color: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+            color: #1b5e20;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .alerta-exito h3 {
+            margin: 0 0 5px 0;
+            color: #1b5e20;
+        }
+        .alerta-exito p {
+            margin: 0;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+        .calendario-contenedor {
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0 20px 0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .calendario-cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .calendario-cabecera h3 {
+            margin: 0;
+            color: #1b5e20;
+            font-size: 1.1em;
+            text-transform: capitalize;
+        }
+        .btn-cal {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .btn-cal:hover {
+            background-color: #1b5e20;
+        }
+        .calendario-cuadricula {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        .dia-semana-etiqueta {
+            font-weight: bold;
+            font-size: 0.8em;
+            color: #666;
+            padding-bottom: 5px;
+        }
+        .celda-dia {
+            padding: 8px 0;
+            font-size: 0.9em;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: white;
+            border: 1px solid #eee;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .celda-dia.desactivado {
+            background-color: #f2f2f2;
+            color: #ccc;
+            cursor: not-allowed;
+            border: 1px solid #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Centro Deportivo HUACA SPORT</h1>
+        <p>Reserva tu Cancha al Instante</p>
+    </header>
+
+    <nav>
+        <div class="contenedor-nav">
+            <a href="principal.html" class="logotipo">
+                <img src="imagenes/logo.png" alt="Logo HUACA SPORT">
+                <span>HUACA SPORT</span>
+            </a>
+            <ul>
+                <li><a href="principal.html">Inicio</a></li>
+                <li><a href="informacion.html">Información</a></li>
+                <li><a href="precios.html">Precios</a></li>
+                <li><a href="contacto.html" class="active">Separar Campo</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="seccion-contenido">
+            <h2>Formulario de Reserva</h2>
+            <p class="centro-texto">Selecciona los datos de tu partido usando el calendario interactivo mensual.</p>
+            
+            <div class="alerta-exito" id="mensajeExito">
+                <h3>¡Reserva Confirmada Exitosamente!</h3>
+                <p id="detalleReserva"></p>
+            </div>
+
+            <form action="#" method="post" id="formReserva">
+                <label for="nombre">Nombres y Apellidos:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej. Juan Diego Guevara" required>
+
+                <label for="campo">Selecciona el Campo:</label>
+                <select id="campo" name="campo" required>
+                    <option value="" disabled selected>-- Elige una cancha --</option>
+                    <option value="Fútbol 6 vs 6">Fútbol 6 vs 6</option>
+                    <option value="Fútbol 8 vs 8">Fútbol 8 vs 8</option>
+                    <option value="Vóley">Vóley</option>
+                </select>
+
+                <label>Selecciona la Fecha del Partido:</label>
+                <div class="calendario-contenedor">
+                    <div class="calendario-cabecera">
+                        <button type="button" class="btn-cal" id="btnMesAnterior">&lt;</button>
+                        <h3 id="mesAnioTitulo"></h3>
+                        <button type="button" class="btn-cal" id="btnMesSiguiente">&gt;</button>
+                    </div>
+                    <div class="calendario-cuadricula" id="cuadriculaCalendario"></div>
+                </div>
+                
+                <input type="hidden" id="fecha" name="fecha" required>
+
+                <label for="hora">Selecciona la Hora:</label>
+                <select id="hora" name="hora" required>
+                    <option value="" disabled selected>-- Elige un horario --</option>
+                    <optgroup label="Turno Día">
+                        <option value="08:00 AM">08:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                    </optgroup>
+                    <optgroup label="Turno Noche">
+                        <option value="06:00 PM">06:00 PM</option>
+                        <option value="07:00 PM">07:00 PM</option>
+                        <option value="08:00 PM">08:00 PM</option>
+                        <option value="09:00 PM">09:00 PM</option>
+                        <option value="10:00 PM">10:00 PM</option>
+                    </optgroup>
+                </select>
+                <label for="duracion">Duración del Alquiler:</label>
+<select id="duracion" name="duracion" required>
+    <option value="1">1 Hora</option>
+    <option value="2">2 Horas Juntas</option>
+    <option value="3">3 Horas Juntas</option>
+    <option value="4">4 Horas Juntas</option>
+    <option value="5">5 Horas Juntas</option>
+</select>
+
+                <div class="botones-form">
+                    <button type="submit" class="btn-enviar">Confirmar Reserva</button>
+                    <button type="reset" class="btn-limpiar" id="btnLimpiar">Limpiar Formulario</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Centro Deportivo HUACA SPORT - Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+       const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+let fGrafica = new Date(), hoy = new Date();
+hoy.setHours(0,0,0,0);
+
+const tit = document.getElementById('mesAnioTitulo'), cuad = document.getElementById('cuadriculaCalendario'), inp = document.getElementById('fecha');
+
+function renderizarCalendario() {
+    cuad.innerHTML = '';
+    let anio = fGrafica.getFullYear(), mes = fGrafica.getMonth();
+    tit.innerText = `${meses[mes]} ${anio}`;
+
+    dias.forEach(d => {
+        cuad.insertAdjacentHTML('beforeend', `<div class="dia-semana-etiqueta">${d}</div>`);
+    });
+
+    let primerDia = new Date(anio, mes, 1).getDay();
+    for (let i = 0; i < primerDia; i++) cuad.appendChild(document.createElement('div'));
+
+    let totalDias = new Date(anio, mes + 1, 0).getDate();
+    for (let d = 1; d <= totalDias; d++) {
+        let celda = document.createElement('div');
+        celda.className = 'celda-dia';
+        celda.innerText = d;
+
+        if (new Date(anio, mes, d) < hoy) {
+            celda.classList.add('desactivado');
+        } else {
+            celda.onclick = () => {
+                document.querySelectorAll('.celda-dia').forEach(c => c.classList.remove('seleccionado'));
+                celda.classList.add('seleccionado');
+                inp.value = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            };
+        }
+        cuad.appendChild(celda);
+    }
+}
+
+const cambiarMes = (v) => { fGrafica.setMonth(fGrafica.getMonth() + v); renderizarCalendario(); };
+document.getElementById('btnMesAnterior').onclick = () => cambiarMes(-1);
+document.getElementById('btnMesSiguiente').onclick = () => cambiarMes(1);
+renderizarCalendario();
+
+const resetAll = () => {
+    document.getElementById('formReserva').reset();
+    inp.value = ""; fGrafica = new Date(); renderizarCalendario();
+};
+
+document.getElementById('formReserva').onsubmit = (e) => {
+    e.preventDefault();
+    if (!inp.value) return alert("Por favor, selecciona un día disponible en el calendario.");
+
+    const usuario = document.getElementById('nombre').value;
+    const tipoCancha = document.getElementById('campo').value;
+    const horaSeleccionada = document.getElementById('hora').value;
+    const cantHoras = document.getElementById('duracion').value;
+
+    let textoHoras = cantHoras == 1 ? "1 hora" : `${cantHoras} horas seguidas`;
+
+    document.getElementById('detalleReserva').innerHTML = `Muchas gracias <strong>${usuario}</strong>. Has reservado el campo de <strong>${tipoCancha}</strong> para el día <strong>${inp.value}</strong> por un total de <strong>${textoHoras}</strong>, iniciando a las <strong>${horaSeleccionada}</strong> en la sede Trujillo.`;
+    document.getElementById('mensajeExito').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    resetAll();
+};
+
+document.getElementById('btnLimpiar').onclick = () => {
+    document.getElementById('mensajeExito').style.display = 'none';
+    resetAll();
+};
+    </script>
+</body>
+</html>
