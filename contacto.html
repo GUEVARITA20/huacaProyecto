@@ -115,7 +115,7 @@
     <main>
         <section class="seccion-contenido">
             <h2>Formulario de Reserva</h2>
-            <p class="centro-texto">Selecciona los datos de tu partido usando el calendario interactivo mensual.</p>
+            <p class="centro-texto">Selecciona los datos de tu partido usando el calendario interactivo mensual. Al enviar, tu reserva se guarda localmente y serás redirigido a WhatsApp para completar la confirmación con HUACA SPORT.</p>
             
             <div class="alerta-exito" id="mensajeExito">
                 <h3>¡Reserva Confirmada Exitosamente!</h3>
@@ -234,6 +234,28 @@ const resetAll = () => {
     inp.value = ""; fGrafica = new Date(); renderizarCalendario();
 };
 
+const guardarReservaLocal = (reserva) => {
+    const key = 'reservasHuacaSport';
+    const reservas = JSON.parse(localStorage.getItem(key) || '[]');
+    reservas.push(reserva);
+    localStorage.setItem(key, JSON.stringify(reservas));
+};
+
+const obtenerTextoWhatsApp = (reserva) => {
+    return encodeURIComponent(
+        `Hola HUACA SPORT, mi nombre es ${reserva.nombre}.\n` +
+        `Deseo separar el ${reserva.campo} el ${reserva.fecha} a las ${reserva.hora} (${reserva.duracion}).\n` +
+        `Por favor, confirmen la disponibilidad y el costo final. Gracias.`
+    );
+};
+
+const numeroWhatsApp = '51928958814'; 
+
+const enviarWhatsApp = (mensaje) => {
+    const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${mensaje}`;
+    window.location.href = url;
+};
+
 document.getElementById('formReserva').onsubmit = (e) => {
     e.preventDefault();
     if (!inp.value) return alert("Por favor, selecciona un día disponible en el calendario.");
@@ -242,13 +264,26 @@ document.getElementById('formReserva').onsubmit = (e) => {
     const tipoCancha = document.getElementById('campo').value;
     const horaSeleccionada = document.getElementById('hora').value;
     const cantHoras = document.getElementById('duracion').value;
+    const textoHoras = cantHoras == 1 ? "1 hora" : `${cantHoras} horas seguidas`;
 
-    let textoHoras = cantHoras == 1 ? "1 hora" : `${cantHoras} horas seguidas`;
+    const reserva = {
+        nombre: usuario,
+        campo: tipoCancha,
+        fecha: inp.value,
+        hora: horaSeleccionada,
+        duracion: textoHoras,
+        creado: new Date().toISOString()
+    };
 
-    document.getElementById('detalleReserva').innerHTML = `Muchas gracias <strong>${usuario}</strong>. Has reservado el campo de <strong>${tipoCancha}</strong> para el día <strong>${inp.value}</strong> por un total de <strong>${textoHoras}</strong>, iniciando a las <strong>${horaSeleccionada}</strong> en la sede Trujillo.`;
+    guardarReservaLocal(reserva);
+
+    document.getElementById('detalleReserva').innerHTML = `Muchas gracias <strong>${usuario}</strong>. Se ha guardado tu reserva de <strong>${tipoCancha}</strong> para el día <strong>${inp.value}</strong> a las <strong>${horaSeleccionada}</strong> (${textoHoras}). Te estamos redirigiendo a WhatsApp para confirmar.`;
     document.getElementById('mensajeExito').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    resetAll();
+
+    setTimeout(() => {
+        enviarWhatsApp(obtenerTextoWhatsApp(reserva));
+    }, 900);
 };
 
 document.getElementById('btnLimpiar').onclick = () => {
